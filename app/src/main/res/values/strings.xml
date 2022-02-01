@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">DataWedge Workflow Sample</string>
+
+    <string name="activity_intent_filter_action">com.darryncampbell.dwworkflowsample.SCAN</string>
+
+    <string name="datawedge_intent_key_source">com.symbol.datawedge.source</string>
+    <string name="datawedge_intent_key_label_type">com.symbol.datawedge.label_type</string>
+    <string name="datawedge_intent_key_data_dispatch_time">com.symbol.datawedge.data_dispatch_time</string>
+    <string name="datawedge_intent_key_data_string">com.symbol.datawedge.data_string</string>
+    <string name="datawedge_intent_key_scanner_identifier">com.symbol.datawedge.scanner_identifier</string>
+    <string name="datawedge_intent_key_decode_data">com.symbol.datawedge.decode_data</string>
+    <string name="datawedge_intent_key_decoded_mode">com.symbol.datawedge.decoded_mode</string>
+    <string name="datawedge_intent_key_image_data">com.symbol.datawedge.image_data</string>
+    <string name="datawedge_intent_key_workflow_name">workflow_name</string>
+    <string name="datawedge_intent_key_data">com.symbol.datawedge.data</string>
+</resources>

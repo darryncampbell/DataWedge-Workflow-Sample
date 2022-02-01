@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+        <TextView
+            android:id="@+id/lblScannedData"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Scanned Data"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <ImageView
+            android:id="@+id/imgFreeformImageCaptureImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblFreeformImageCaptureImage"
+            app:srcCompat="@android:drawable/btn_star" />
+
+        <TextView
+            android:id="@+id/lblTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Time:"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblScannedData" />
+
+        <TextView
+            android:id="@+id/lblSource"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Source:"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblScannerStatus" />
+
+        <TextView
+            android:id="@+id/lblDataString"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Data (String):"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblSource" />
+
+        <TextView
+            android:id="@+id/lblDecodeMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Decode Mode:"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtDataString" />
+
+        <TextView
+            android:id="@+id/lblSymbology"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Symbology:"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblDecodeMode" />
+
+        <TextView
+            android:id="@+id/txtImageUri"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="Please scan barcode"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/lblWorkflowResult"
+            app:layout_constraintTop_toTopOf="@+id/lblImageUri" />
+
+        <TextView
+            android:id="@+id/lblImageUri"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Image URI:"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblSymbology" />
+
+        <TextView
+            android:id="@+id/lblWorkflow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Workflow Data"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblImageUri" />
+
+        <TextView
+            android:id="@+id/lblWorkflowResult"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Workflow Result:"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblWorkflowStatus" />
+
+        <TextView
+            android:id="@+id/txtTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="Please scan barcode"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/lblWorkflowResult"
+            app:layout_constraintTop_toTopOf="@+id/lblTime" />
+
+        <TextView
+            android:id="@+id/txtSource"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="Please scan barcode"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/lblWorkflowResult"
+            app:layout_constraintTop_toTopOf="@+id/lblSource" />
+
+        <TextView
+            android:id="@+id/txtDataString"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="8dp"
+            android:text="Please scan barcode"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/lblWorkflowResult"
+            app:layout_constraintTop_toTopOf="@+id/lblDataString" />
+
+        <TextView
+            android:id="@+id/txtDecodeMode"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="Please scan barcode"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/lblWorkflowResult"
+            app:layout_constraintTop_toTopOf="@+id/lblDecodeMode" />
+
+        <TextView
+            android:id="@+id/txtWorkflowResult"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="Please scan barcode"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblWorkflowResult" />
+
+        <TextView
+            android:id="@+id/txtSymbology"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Please scan barcode"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintStart_toEndOf="@+id/lblWorkflowResult"
+            app:layout_constraintTop_toTopOf="@+id/lblSymbology" />
+
+        <TextView
+            android:id="@+id/lblScannerStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Status:"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblTime"/>
+
+        <TextView
+            android:id="@+id/txtScannerStatus"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Waiting for Status"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/lblWorkflowResult"
+            app:layout_constraintTop_toTopOf="@+id/lblScannerStatus"/>
+
+        <TextView
+            android:id="@+id/lblWorkflowStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Workflow Status:"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblWorkflow"/>
+
+        <TextView
+            android:id="@+id/txtWorkflowStatus"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Waiting for Status"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/lblWorkflowResult"
+            app:layout_constraintTop_toTopOf="@+id/lblWorkflowStatus"/>
+
+        <TextView
+            android:id="@+id/lblFreeformImageCaptureImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Freeform Image Capture Image"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtWorkflowResult" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
