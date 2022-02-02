@@ -17,6 +17,7 @@
             android:id="@+id/lblScannedData"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:layout_marginStart="8dp"
             android:text="Scanned Data"
             android:textStyle="bold"
@@ -25,13 +26,13 @@
 
 
         <ImageView
-            android:id="@+id/imgFreeformImageCaptureImage"
+            android:id="@+id/img"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/lblFreeformImageCaptureImage"
+            app:layout_constraintTop_toBottomOf="@+id/lblImage"
             app:srcCompat="@android:drawable/btn_star" />
 
         <TextView
@@ -90,6 +91,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
+            android:visibility="gone"
             android:text="Please scan barcode"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/lblWorkflowResult"
@@ -102,6 +104,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="Image URI:"
+            android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/lblSymbology" />
 
@@ -124,7 +127,7 @@
             android:layout_marginTop="8dp"
             android:text="Workflow Result:"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/lblWorkflowStatus" />
+            app:layout_constraintTop_toBottomOf="@+id/lblOCRResult" />
 
         <TextView
             android:id="@+id/txtTime"
@@ -187,6 +190,7 @@
             android:id="@+id/txtSymbology"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
             android:text="Please scan barcode"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
@@ -236,7 +240,7 @@
             app:layout_constraintTop_toTopOf="@+id/lblWorkflowStatus"/>
 
         <TextView
-            android:id="@+id/lblFreeformImageCaptureImage"
+            android:id="@+id/lblImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"
@@ -245,6 +249,27 @@
             android:text="Freeform Image Capture Image"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/txtWorkflowResult" />
+
+        <TextView
+            android:id="@+id/lblOCRResult"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="OCR Result:"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblWorkflowStatus" />
+
+        <TextView
+            android:id="@+id/txtOCRResult"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="Please scan object"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintStart_toEndOf="@+id/lblWorkflowResult"
+            app:layout_constraintTop_toTopOf="@+id/lblOCRResult" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

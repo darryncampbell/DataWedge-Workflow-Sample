@@ -3,6 +3,7 @@ package com.darryncampbell.datawedgeworkflowsample;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 public class DWUtilities {
     private static final String PROFILE_NAME = "Workflow Sample";
@@ -23,14 +24,14 @@ public class DWUtilities {
         profileConfig.putString("PROFILE_ENABLED", "true"); //  Seems these are all strings
         profileConfig.putString("CONFIG_MODE", "UPDATE");
 
-        Bundle barcodeConfig = new Bundle();
-        barcodeConfig.putString("PLUGIN_NAME", "BARCODE");
-        barcodeConfig.putString("RESET_CONFIG", "true");
-        Bundle barcodeProps = new Bundle();
-        barcodeProps.putString("configure_all_scanners", "true");
-        barcodeProps.putString("scanner_input_enabled", "false");  //  todo why is this 'false' not applying?  Change to scanner_selection auto?  And remove configure_all_scanners?
-        barcodeConfig.putBundle("PARAM_LIST", barcodeProps);
-        profileConfig.putBundle("PLUGIN_CONFIG", barcodeConfig);
+        //Bundle barcodeConfig = new Bundle();
+        //barcodeConfig.putString("PLUGIN_NAME", "BARCODE");
+        //barcodeConfig.putString("RESET_CONFIG", "false");
+        //Bundle barcodeProps = new Bundle();
+        //barcodeProps.putString("scanner_selection", "auto");
+        //barcodeProps.putString("scanner_input_enabled", "true");
+        //barcodeConfig.putBundle("PARAM_LIST", barcodeProps);
+        //profileConfig.putBundle("PLUGIN_CONFIG", barcodeConfig);
         Bundle appConfig = new Bundle();
         appConfig.putString("PACKAGE_NAME", context.getPackageName());      //  Associate the profile with this app
         appConfig.putStringArray("ACTIVITY_LIST", new String[]{"*"});
@@ -60,6 +61,8 @@ public class DWUtilities {
         keystrokeConfig.putBundle("PARAM_LIST", keystrokeProps);
         profileConfig.putBundle("PLUGIN_CONFIG", keystrokeConfig);
         sendDataWedgeIntentWithExtra(context, ACTION_DATAWEDGE, EXTRA_SET_CONFIG, profileConfig);
+
+        Toast.makeText(context, "Profile " + PROFILE_NAME + " created.  \nPlease select workflow options manually", Toast.LENGTH_SHORT).show();
     }
 
     private static void sendDataWedgeIntentWithExtra(Context context, String action, String extraKey, String extraValue)

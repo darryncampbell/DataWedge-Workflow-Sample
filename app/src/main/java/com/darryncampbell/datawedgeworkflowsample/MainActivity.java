@@ -9,13 +9,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,14 +21,8 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -41,9 +33,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //  todo
-        //        DWUtilities.CreateDWProfile(this);
-        //  todo register for this and display it (create the method first)
+        DWUtilities.CreateDWProfile(this);
         DWUtilities.registerForNotifications(this, DWUtilities.NOTIFICATION_TYPE_SCANNER_STATUS);
         DWUtilities.registerForNotifications(this, DWUtilities.NOTIFICATION_TYPE_WORKFLOW_STATUS);
 
@@ -62,7 +52,8 @@ public class MainActivity extends AppCompatActivity {
         updateTextView(R.id.txtScannerStatus, "Waiting for Status");
         updateTextView(R.id.txtWorkflowStatus, "Waiting for Status");
         updateTextView(R.id.txtWorkflowResult, "Please Scan Barcode");
-        updateImage(R.id.imgFreeformImageCaptureImage, null);
+        updateTextView(R.id.txtDataString, "Please Scan Barcode");
+        updateImage(R.id.img, null);
     }
 
     @Override
@@ -78,13 +69,12 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(getResources().getString(R.string.activity_intent_filter_action)))
             {
-                //  todo delete redundant code
-                //  todo what if use content provider?
+                updateTextView(R.id.txtDataString, "Please Scan Barcode");
+                updateTextView(R.id.txtWorkflowResult, "Please Scan Barcode");
 
+                //  Note: Intent Output plugin setting for 'Use Content providers' is not used for Workflow or barcode highlighting
                 updateTextView(R.id.txtTime, dateFormat.format(new Timestamp(System.currentTimeMillis())));
 
-                //for (String key : intent.getExtras().keySet())
-                //    Log.v(LOG_TAG, "key: " + key);
                 String source = intent.getStringExtra(getResources().getString(R.string.datawedge_intent_key_source));
                 Log.d(LOG_TAG, "Decode Source: " + source);
                 updateTextView(R.id.txtSource, source);
@@ -101,31 +91,8 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(LOG_TAG, "Decode Symbology: " + symbology);
                 updateTextView(R.id.txtSymbology, symbology);
 
-                String imageUri = intent.getStringExtra(getResources().getString(R.string.datawedge_intent_key_image_data));
-                Log.d(LOG_TAG, "Decode ImageUri: " + imageUri);
-                updateTextView(R.id.txtImageUri, imageUri);
-
-                //String WorkflowName = intent.getStringExtra(getResources().getString(R.string.datawedge_intent_key_workflow_name)); //  Not documented
-
                 String data = intent.getStringExtra(getResources().getString(R.string.datawedge_intent_key_data));
                 Log.d(LOG_TAG, "Decode Data: " + data);
-
-                //String scannerIdentifier = intent.getStringExtra(getResources().getString(R.string.datawedge_intent_key_scanner_identifier)); //  Not documented
-                //ArrayList<byte[]> dataBytes = (ArrayList<byte[]>) intent.getSerializableExtra(getResources().getString(R.string.datawedge_intent_key_decode_data));
-                //if (dataBytes != null)
-                //{
-                //    Log.d(LOG_TAG, "Decode Data Bytes (size): " + dataBytes.size());
-                //    for (int j = 0; j < dataBytes.size(); j++)
-                //    {
-                //        byte[] rawBytes = dataBytes.get(0);
-                //        String rawBytesAsString = "";
-                //        for (int i = 0; i < rawBytes.length; i++)
-                //            rawBytesAsString += " " + rawBytes[i];
-                //        Log.d(LOG_TAG, "Decode Data Bytes (" + j + "): " + rawBytesAsString);
-                //    }
-                //}
-                //Log.d(LOG_TAG, "Decode Scanner ID: " + scannerIdentifier);
-                //Log.d(LOG_TAG, "Decode Workflow Name: " + WorkflowName);
                 if (data != null)
                 {
                     try {
@@ -137,14 +104,46 @@ public class MainActivity extends AppCompatActivity {
                             Log.v(LOG_TAG, "Workflow Object: " + workflowObject.toString());
                             if (workflowObject.has("string_data"))
                             {
-                                Log.d(LOG_TAG, "Workflow " + i + " string_data: " + workflowObject.get("string_data")); //  Not an image
+                                Log.d(LOG_TAG, "Workflow " + i + " string_data: " + workflowObject.get("string_data"));
                                 String label = workflowObject.getString("label");
-                                if (label.equalsIgnoreCase(""))
-                                    Log.d(LOG_TAG, "Free-form image capture");
-                                else if (label.equalsIgnoreCase("License Plate"))
+                                if (label.equalsIgnoreCase("License Plate"))
                                 {
-                                    //  todo and so on for Identification document, VIN, TIN, Meter
-                                    //  hide freeform image capture image and replace with correct image
+                                    Log.d(LOG_TAG, "License Plate");
+                                    //  todo test this
+                                    updateTextView(R.id.txtOCRResult, "License Plate: " + workflowObject.get("string_data"));
+                                    updateTextView(R.id.lblImage, "License Plate Image");
+                                }
+                                else if (label.equalsIgnoreCase("Identification Document"))
+                                {
+                                    Log.d(LOG_TAG, "Identification Document");
+                                    //  todo parse identity document (https://techdocs.zebra.com/datawedge/11-2/guide/programmers-guides/workflow-input/#ocrresult)
+                                    //updateTextView(R.id.txtOCRResult, "ID: " + workflowObject.get("string_data"));
+                                    updateTextView(R.id.lblImage, "Identity Document Image");
+                                }
+                                else if (label.equalsIgnoreCase("VIN"))
+                                {
+                                    Log.d(LOG_TAG, "VIN (Vehicle Identification Number)");
+                                    //  todo test this
+                                    updateTextView(R.id.txtOCRResult, "Vehicle ID: " + workflowObject.get("string_data"));
+                                    updateTextView(R.id.lblImage, "Vehicle ID Image");
+                                }
+                                else if (label.equalsIgnoreCase("TIN"))
+                                {
+                                    Log.d(LOG_TAG, "TIN (Tyre Identification Number)");
+                                    //  todo test this
+                                    updateTextView(R.id.txtOCRResult, "Tyre ID: " + workflowObject.get("string_data"));
+                                    updateTextView(R.id.lblImage, "Tyre ID Image");
+                                }
+                                else if (label.equalsIgnoreCase("Meter"))
+                                {
+                                    Log.d(LOG_TAG, "Meter (e.g. Gas meter)");
+                                    //  todo test this
+                                    updateTextView(R.id.txtOCRResult, "Meter: " + workflowObject.get("string_data"));
+                                    updateTextView(R.id.lblImage, "Meter Image");
+                                }
+                                else{
+                                    Log.d(LOG_TAG, "Freeform image capture");
+                                    updateTextView(R.id.lblImage, "Freeform Image Capture Image");
                                 }
                             }
                             else
@@ -166,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
                                     if (imageAsBytes != null)
                                     {
                                         bitmap = ImageProcessing.getInstance().getBitmap(imageAsBytes, imageFormat, orientation, stride, width, height);
-                                        updateImage(R.id.imgFreeformImageCaptureImage, bitmap);
+                                        updateImage(R.id.img, bitmap);
                                     }else
                                         Log.w(LOG_TAG, "Error processing Image data");
                                 }
@@ -176,14 +175,9 @@ public class MainActivity extends AppCompatActivity {
                         Log.w(LOG_TAG, "JSON Exception parsing data: " + e.getMessage());
                     }
                 }
-
-                //  todo handle workflow data & content provider
             }
             else if (intent.getAction().equals(DWUtilities.NOTIFICATION_ACTION))
             {
-                //  todo add scanner status
-                //  todo write status to UI
-                
                 if (intent.hasExtra("com.symbol.datawedge.api.NOTIFICATION")) {
                     Bundle b = intent.getBundleExtra("com.symbol.datawedge.api.NOTIFICATION");
                     String NOTIFICATION_TYPE = b.getString("NOTIFICATION_TYPE");
@@ -259,7 +253,6 @@ public class MainActivity extends AppCompatActivity {
 
                     cursorNextData.close();
                 }
-
             }
             cursor.close();
         }
