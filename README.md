@@ -31,12 +31,12 @@ You can highlight barcodes in the current field of view which meet your specifie
 
 ![Applictaion](https://github.com/darryncampbell/DataWedge-Workflow-Sample/raw/main/media/barcode_highlighting.png)
 
-**Possible uses:**
+### Possible uses for Barcode Highlighting:
 
 - Provide onscreen feedback to let the operator know which barcodes are being captured
 - Help the operator find an item by highlighting the barcode
 
-**How to configure:**
+### How to configure Barcode Highlighting:
 
 Barcode highlighting is part of the *Barcode Input* plugin, not the separate Workflow Input plugin.
 
@@ -58,7 +58,7 @@ To configure barcode highlighting, configure your DataWedge profile as follows:
 
 ![Barcode Highlighting Configuration](https://github.com/darryncampbell/DataWedge-Workflow-Sample/raw/main/media/dw_barcode_highlighting_conditions_identifier.png)
 
-**How to use:**
+### How to use Barcode Highlighting
 
 - The hardware or software trigger will initiate the scanning session
 - When a barcode meeting the specified criteria is seen in the viewfinder, it will be highlighted.
@@ -82,14 +82,36 @@ The video also shows how the highlighting rules are configured with DataWedge.
 
 The rules are configured to highlight and report EAN13 barcodes of any length and with any contents.
 
-**Coding considerations for Barcode Highlighting**
+### Coding and Barcode Highlighting: Receiving Data
 
-*Input:*
+Although part of the Barcode input plugin, barcode highlighting borrows a lot of its logic from the Workflow plugin.  What that means for you as a developer is you should follow the [Workflow programmer's guide](https://techdocs.zebra.com/datawedge/11-2/guide/programmers-guides/workflow-input/) to extract data returned from the Intent output plugin, though there will be no image data.
+
+```java
+//  Given the data returned via 'intent'
+String data = intent.getStringExtra("com.symbol.datawedge.decode_data");
+JSONArray dataArray = new JSONArray(data);
+for (int i = 0; i < dataArray.length(); i++)
+{
+  JSONObject workflowObject = dataArray.getJSONObject(i);
+  if (workflowObject.has("string_data"))
+  {
+    String label = workflowObject.getString("label");
+    if (label.equalsIgnoreCase(""))
+    {
+      //  Each data decoded barcode is stored in workflowObject.getString("string_data")       
+    }
+  }
+}
+
+```
+
+### Coding and Barcode Highlighting: Configuring DataWedge
+
 There are 2 ways to configure barcode highlighting in code
 
 1. At Runtime:
 
-   A new API has been been introduced in DataWedge 11.2, [Switch Data Capture](https://techdocs.zebra.com/datawedge/11-2/guide/api/switchdatacapture/) to allow you to switch from 'regular' scanning, to barcode highlighting.  A full code example is given in the [help docs](https://techdocs.zebra.com/datawedge/11-2/guide/api/switchdatacapture/#switchbetweenbarcodescanningandhighlighting) but as a high level summary:
+A new API has been been introduced in DataWedge 11.2, [Switch Data Capture](https://techdocs.zebra.com/datawedge/11-2/guide/api/switchdatacapture/) to allow you to switch from 'regular' scanning, to barcode highlighting.  A full code example is given in the [help docs](https://techdocs.zebra.com/datawedge/11-2/guide/api/switchdatacapture/#switchbetweenbarcodescanningandhighlighting) but as a high level summary:
 
 ```java
 Intent i = new Intent();
@@ -125,14 +147,94 @@ I strongly recommend you copy / paste the example from techdocs and modify as ne
 
 2. Persistently:
 
-   A new section has been added to the existing SetConfig API for [Barcode Highlighting Parameters](https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#barcodehighlightingparameters).  The format passed to SetConfig is very similar to that passed to the new 'Switch Data Capture' API, i.e. create a nested bundle structure for rules, actions and criteria.
+A new section has been added to the existing SetConfig API for [Barcode Highlighting Parameters](https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#barcodehighlightingparameters).  The format passed to SetConfig is very similar to that passed to the new 'Switch Data Capture' API, i.e. create a nested bundle structure for rules, actions and criteria.
 
 For a full example of barcode highlighting through SetConfig please see the [Techdocs example](https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#setbarcodehighlightingparameters)
 
 Again, I strongly recommend you copy / paste the example and modify as needed
 
-*Output:*
-Although part of the Barcode input plugin, barcode highlighting borrows a lot of its logic from the Workflow plugin.  What that means for you as a developer is you should follow the [Workflow programmer's guide](https://techdocs.zebra.com/datawedge/11-2/guide/programmers-guides/workflow-input/) to extract data returned from the Intent output plugin
+### Coding and Barcode Highlighting: Registering for change
+
+The [RegisterForNotification](https://techdocs.zebra.com/datawedge/11-2/guide/api/registerfornotification/) API has been updated to report the status of the workflow plugin and since barcode highlighting is implemented by the workflow plugin (though presented separately on the UI) it follows the same lifecycle.
+
+Register to receive the Workflow notifications.  See the [RegisterForNotification](https://techdocs.zebra.com/datawedge/11-2/guide/api/registerfornotification/) docs or this app for more detailed code:
+
+```java
+Bundle b = new Bundle();
+b.putString("com.symbol.datawedge.api.APPLICATION_NAME", getPackageName());
+b.putString("com.symbol.datawedge.api.NOTIFICATION_TYPE", "WORKFLOW_STATUS");
+```
+
+Process the received notification
+
+```java
+case "WORKFLOW_STATUS":
+  Log.d(LOG_TAG, "WORKFLOW_STATUS: status: " + b.getString("STATUS");
+  break;
+```
+
+**Be aware**: Any Intent API sent to DataWedge before the 'PLUGIN_READY' status will lead to undefined behaviour.
+
+### Some additional notes for Barcode Highlighting:
+
+- Reporting will only report barcodes meeting the specified criteria currently highlighted in the viewfinder.  If you want to capture barcodes outside the viewfinder, for example, if you are waving the device across multiple barcodes, then you should use the 'Freeform Image Capture' Workflow.
+- The order the results are given will be the order in which the barcodes were recognised by the decoding algorithm, this is not something the user can influence.
+- Captured Barcodes are reported in the same way as "Workflow" data capture.  I.e. the Intent plugin will report the result through `com.symbol.datawedge.data`
+- If multiple barcodes are captured, the data will be concatenated, i.e. `com.symbol.datawedge.data_string` will return all data without any separators.  It is recommended to use `com.symbol.datawedge.data` instead. 
+- If you switch scanners when configuring DataWedge, your highlighting rules will be lost (with this initial release)
+- As stated in the documentation, the keystroke output will concatenate all the data without any separators.  This means the Intent plugin is really the only viable way to receive data. 
+
+
+## Freeform Image Capture
+
+Even if your device does not have a camera, you can now capture an image using the barcode scanner.  Any barcodes that have been seen during the capture session will be returned to your app along with the image. 
+
+### Possible uses of Freeform Image Capture
+
+- Capture an image through the device imager (scanner), without a camera.
+- Capture proof of delivery and the tracking barcode in a single step
+
+### How to configure Freeform Image Capture
+
+Freeform Image capture is delivered through a new DataWedge input plugin called 'Workflow'.  This is separate from the standard 'Barcode' input plugin.
+
+To configure freeform image capture, configure your DataWedge profile as follows:
+
+1. Enable the Workflow input plugin.  If doing this through the DataWedge UI, you will be prompted that you cannot have both the Barcode and Workflow input plugins active.
+2. Scroll down to the 'Image Capture' section of the plugin and enable it.
+3. Press the ellipsis to bring up additional parameters
+4. Choose the input source, either camera or imager
+5. Set the session timeout, in ms.  This is the length of time the scanning session will be held open until cancelled, if the trigger was not pulled.
+6. Select 'Decode And Highlight Barcodes' to return data.  Although set to 'Highlight' only by default, most use cases will also want to return data.
+7. Set the additional feedback parameters, such as haptic feedback, LED notification and decode audio feedback.  This is the feedback that will be given whenever a new barcode is seen in the viewfinder, so as you pan across multiple barcodes your device will inform you whenever it sees a barcode. 
+
+![Freeform Image Configuration](https://github.com/darryncampbell/DataWedge-Workflow-Sample/raw/main/media/dw_freeform_image_capture_config_1.png)
+
+### How to use Freeform Image Capture
+
+- The hardware or software trigger will initiate the data acquisition session
+- As the system sees barcodes, it will highlight them to let the user know it has been seen.  Note: it is NOT possible to change the highlight colour with freeform image capture.
+- The next trigger press will capture the image, so the user can step back if need be, to ensure the entire object is within view.
+- If the 'Decode / Highlight' option is turned on, it will return the image and the barcodes that had been highlighted.
+
+### Video Demos of Freeform Image Capture
+
+**The following video shows freeform image capture with barcode highlighting via the Camera:**
+
+This shows panning across many barcodes during a long scanning session.
+
+[![DataWedge freeform image capture with barcode highlighting via Camera](https://img.youtube.com/vi/BWAvUeLFnQI/0.jpg)](https://www.youtube.com/watch?v=BWAvUeLFnQI)
+
+**The following video shows freeform image capture with barcode highlighting via the Imager:**
+
+This shows a brief scanning session with many barcodes in view.
+
+[![DataWedge freeform image capture with barcode highlighting via Camera](https://img.youtube.com/vi/hwTDCuvcjYk/0.jpg)](https://www.youtube.com/watch?v=hwTDCuvcjYk)
+
+
+### Coding and Freeform Image Capture: Receiving Data
+
+The [Workflow programmer's guide](https://techdocs.zebra.com/datawedge/11-2/guide/programmers-guides/workflow-input/) gives a lot of detail how to parse workflow return types.  The code applicable to freeform image capture is given below
 
 ```java
 //  Given the data returned via 'intent'
@@ -171,33 +273,61 @@ for (int i = 0; i < dataArray.length(); i++)
 
 ```
 
-### Some additional notes:
+### Coding and Freeform Image Capture: Configuring DataWedge
 
-- Reporting will only report barcodes meeting the specified criteria currently highlighted in the viewfinder.  If you want to capture barcodes outside the viewfinder, for example, if you are waving the device across multiple barcodes, then you should use the 'Freeform Image Capture' Workflow.
-- The order the results are given will be the order in which the barcodes were recognised by the decoding algorithm, this is not something the user can influence.
-- Captured Barcodes are reported in the same way as "Workflow" data capture.  I.e. the Intent plugin will report the result through `com.symbol.datawedge.data`
-- If multiple barcodes are captured, the data will be concatenated, i.e. `com.symbol.datawedge.data_string` will return all data without any separators.  It is recommended to use `com.symbol.datawedge.data` instead. 
-- If you switch scanners when configuring DataWedge, your highlighting rules will be lost (with this initial release)
-- As stated in the documentation, the keystroke output will concatenate all the data without any separators.  This means the Intent plugin is really the only viable way to receive data. 
+There are two ways to configure freeform image capture in code.  This section is similar to the earlier section talking about configuring DataWedge for barcode highlighting but some of the detail is different.
+
+1. At Runtime:
+   
+As discussed in the "Coding and Barcode Highlighting: Configuring DataWedge" section, a new API has been introduced in DataWedge 11.2, [Switch Data Capture](https://techdocs.zebra.com/datawedge/11-2/guide/api/switchdatacapture/) to allow you to switch from 'regular' scanning to any of the workflow input options.  
+   
+The full code example in the [help docs for Switch Data Capture](https://techdocs.zebra.com/datawedge/11-2/guide/api/switchdatacapture/#switchbetweenworkflowoptions) refers exclusively to ID cards.  For a freeform image capture example you can copy the format provided in the [Set Config Example](https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#setfreeformimagecaptureconfiguration):
+
+```java
+Intent i = new Intent();
+i.putExtra("com.symbol.datawedge.api.SWITCH_DATACAPTURE", "WORKFLOW");
+Bundle paramList = new Bundle();
+paramList.putString("workflow_name","free_form_capture");
+paramList.putString("workflow_input_source","2");
+Bundle paramSet1 = new Bundle();
+paramSet1.putString("module","BarcodeTrackerModule");
+Bundle moduleAParams = new Bundle();
+moduleContainerDecoderModule.putString("session_timeout", "16000");
+moduleContainerDecoderModule.putString("illumination", "off");
+moduleContainerDecoderModule.putString("decode_and_highlight_barcodes", "1");
+paramSet1.putBundle("module_params",moduleAParams);
+//  Feedback params omitted from this code sample
+ArrayList<Bundle> paramSetList = new ArrayList<>();
+paramSetList.add(paramSet1);
+paramList.putParcelableArrayList("workflow_params", paramSetList);
+i.putExtra("PARAM_LIST", paramList);
+sendBroadcast(i);
+```
 
 
-## Freeform Image Capture
+2. Persistently:
+   
+A new section has been added to the existing SetConfig API for [Workflow Input Parameters](https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#workflowinputparameters).  
 
-Even if your device does not have a camera, you can now capture an image using the barcode scanner.  Any barcodes that have been seen during the capture session will be returned to your app along with the image. 
+There is a [dedicated SetConfig example](https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#setfreeformimagecaptureconfiguration) for freeform image capture.
 
-**The following video shows freeform image capture with barcode highlighting via the Camera:**
+### Coding and Freeform Image Capture: Registering for change
 
-[![DataWedge freeform image capture with barcode highlighting via Camera](https://img.youtube.com/vi/BWAvUeLFnQI/0.jpg)](https://www.youtube.com/watch?v=BWAvUeLFnQI)
+Registering for change in the workflow plugin status was covered earlier in the "Coding and Barcode Highlighting: Registering for change" section.  The code will be identical
 
-**The following video shows freeform image capture with barcode highlighting via the Imager:**
-
-[![DataWedge freeform image capture with barcode highlighting via Camera](https://img.youtube.com/vi/hwTDCuvcjYk/0.jpg)](https://www.youtube.com/watch?v=hwTDCuvcjYk)
-
-registerfornotification
 
 ## OCR: License Plates, VIN, TIN, Meters
 
+
+https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#setlicenseplateconfiguration
+https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#setvehicleidentificationnumbervinconfiguration
+https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#settireidentificationnumbertinconfiguration
+https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#setmeterconfiguration
+
 ## OCR: Identity Documents
+
+https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#setidentificationdocumentconfiguration
+
 
 ## Not to be confused with...
 
