@@ -31,6 +31,8 @@ You can highlight barcodes in the current field of view which meet your specifie
 
 ![Applictaion](https://github.com/darryncampbell/DataWedge-Workflow-Sample/raw/main/media/barcode_highlighting.png)
 
+Example showing barcode highlighting configured to set PDF417 barcodes to orange and Code128 barcodes less than 13 characters to blue.
+
 ### Possible uses for Barcode Highlighting:
 
 - Provide onscreen feedback to let the operator know which barcodes are being captured
@@ -53,7 +55,7 @@ To configure barcode highlighting, configure your DataWedge profile as follows:
    - The barcode symbology.
 5. Rules are executed in priority order from top to bottom
 6. Specify the **reporting** rules.  If you do not specify the reporting rule, your barcode(s) will not be sent to your app.
-7. Reporting rules and highlighting rules have different conditions, meaning you can choose to report different barcodes that what are being highlighted, though it is recommended to keep these rule the same.
+7. Reporting rules and highlighting rules have different conditions, meaning you can choose to report different barcodes than what are being highlighted, though it is recommended to keep these rule the same.
 8. Specify the reporting action to have these barcodes returned to the application.
 
 ![Barcode Highlighting Configuration](https://github.com/darryncampbell/DataWedge-Workflow-Sample/raw/main/media/dw_barcode_highlighting_conditions_identifier.png)
@@ -78,13 +80,11 @@ Also notice how data is returned in a JSON array output to the text field withou
 
 [![DataWedge Barcode Highlighting via Camera](https://img.youtube.com/vi/E5ZkZtUNX_k/0.jpg)](https://www.youtube.com/watch?v=E5ZkZtUNX_k)
 
-The video also shows how the highlighting rules are configured with DataWedge.  
-
-The rules are configured to highlight and report EAN13 barcodes of any length and with any contents.
+The video also shows how the highlighting rules are configured with DataWedge.  The rules are configured to highlight and report EAN13 barcodes of any length and with any contents.
 
 ### Coding and Barcode Highlighting: Receiving Data
 
-Although part of the Barcode input plugin, barcode highlighting borrows a lot of its logic from the Workflow plugin.  What that means for you as a developer is you should follow the [Workflow programmer's guide](https://techdocs.zebra.com/datawedge/11-2/guide/programmers-guides/workflow-input/) to extract data returned from the Intent output plugin, though there will be no image data.
+Although part of the Barcode input plugin, barcode highlighting borrows a lot of its logic from the Workflow plugin.  What that means for you as a developer is you should follow the [Workflow programmer's guide](https://techdocs.zebra.com/datawedge/11-2/guide/programmers-guides/workflow-input/) to extract data returned from the Intent output plugin, **though there will be no image data**.
 
 ```java
 //  Given the data returned via 'intent'
@@ -99,6 +99,8 @@ for (int i = 0; i < dataArray.length(); i++)
     if (label.equalsIgnoreCase(""))
     {
       //  Each data decoded barcode is stored in workflowObject.getString("string_data")       
+      //  Symbology returned in workflowObject.getString("barcodetype")
+
     }
   }
 }
@@ -109,7 +111,7 @@ for (int i = 0; i < dataArray.length(); i++)
 
 There are 2 ways to configure barcode highlighting in code
 
-1. At Runtime:
+**1. At Runtime:**
 
 A new API has been been introduced in DataWedge 11.2, [Switch Data Capture](https://techdocs.zebra.com/datawedge/11-2/guide/api/switchdatacapture/) to allow you to switch from 'regular' scanning, to barcode highlighting.  A full code example is given in the [help docs](https://techdocs.zebra.com/datawedge/11-2/guide/api/switchdatacapture/#switchbetweenbarcodescanningandhighlighting) but as a high level summary:
 
@@ -118,34 +120,34 @@ Intent i = new Intent();
 i.putExtra("com.symbol.datawedge.api.SWITCH_DATACAPTURE", "BARCODE");
 //  Add highlighting rules
 Bundle paramList = new Bundle();
-paramList.putString("scanner_selection_by_identifier", "INTERNAL_IMAGER");
-paramList.putString("barcode_highlighting_enabled", "true");
+  paramList.putString("scanner_selection_by_identifier", "INTERNAL_IMAGER");
+  paramList.putString("barcode_highlighting_enabled", "true");
 Bundle rule1 = new Bundle();
-rule1.putString("rule_name", "Rule1");
+  rule1.putString("rule_name", "Rule1");
 Bundle rule1Criteria = new Bundle();
 Bundle bundleContains1 = new Bundle();
-bundleContains1.putString("criteria_key", "contains");
-bundleContains1.putString("criteria_value", "090986");
-ArrayList<Bundle> identifierParamList = new ArrayList<>();
-identifierParamList.add(bundleContains1);
-rule1Criteria.putParcelableArrayList("identifier", identifierParamList);
+  bundleContains1.putString("criteria_key", "contains");
+  bundleContains1.putString("criteria_value", "090986");
+  ArrayList<Bundle> identifierParamList = new ArrayList<>();
+    identifierParamList.add(bundleContains1);
+    rule1Criteria.putParcelableArrayList("identifier", identifierParamList);
 //  Similar logic for criteria
 ...
 ArrayList<Bundle> ruleList = new ArrayList<>();
-ruleList.add(rule1);
+  ruleList.add(rule1);
 Bundle ruleBundlebarcodeOverlay = new Bundle();
-ruleBundlebarcodeOverlay.putString("rule_param_id", "barcode_overlay");
-ruleBundlebarcodeOverlay.putParcelableArrayList("rule_list", ruleList);
-ArrayList<Bundle> ruleParamList = new ArrayList<>();
-ruleParamList.add(ruleBundlebarcodeOverlay);
-paramList.putParcelableArrayList("rules", ruleParamList);
+  ruleBundlebarcodeOverlay.putString("rule_param_id", "barcode_overlay");
+  ruleBundlebarcodeOverlay.putParcelableArrayList("rule_list", ruleList);
+  ArrayList<Bundle> ruleParamList = new ArrayList<>();
+    ruleParamList.add(ruleBundlebarcodeOverlay);
+    paramList.putParcelableArrayList("rules", ruleParamList);
 i.putExtra("PARAM_LIST", paramList);
 sendBroadcast(i);
 ```
 
 I strongly recommend you copy / paste the example from techdocs and modify as needed
 
-2. Persistently:
+**2. Persistently:**
 
 A new section has been added to the existing SetConfig API for [Barcode Highlighting Parameters](https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#barcodehighlightingparameters).  The format passed to SetConfig is very similar to that passed to the new 'Switch Data Capture' API, i.e. create a nested bundle structure for rules, actions and criteria.
 
@@ -177,17 +179,17 @@ case "WORKFLOW_STATUS":
 
 ### Some additional notes for Barcode Highlighting:
 
-- Reporting will only report barcodes meeting the specified criteria currently highlighted in the viewfinder.  If you want to capture barcodes outside the viewfinder, for example, if you are waving the device across multiple barcodes, then you should use the 'Freeform Image Capture' Workflow.
-- The order the results are given will be the order in which the barcodes were recognised by the decoding algorithm, this is not something the user can influence.
+- Reporting will only report barcodes meeting the specified criteria currently highlighted in the viewfinder.  **If you want to capture barcodes outside the viewfinder, for example, if you are waving the device across multiple barcodes, then you should use the 'Freeform Image Capture' Workflow**.
 - Captured Barcodes are reported in the same way as "Workflow" data capture.  I.e. the Intent plugin will report the result through `com.symbol.datawedge.data`
-- If multiple barcodes are captured, the data will be concatenated, i.e. `com.symbol.datawedge.data_string` will return all data without any separators.  It is recommended to use `com.symbol.datawedge.data` instead. 
+- The order the results are given will be the order in which the barcodes were recognised by the decoding algorithm, this is not something the user can influence.  An `identifier` field is returned in the JSONObject for each barcode captured.
+- If multiple barcodes are captured, the value returned in `com.symbol.datawedge.data_string` will be concatenated without any separators.  It is strongly recommended to use `com.symbol.datawedge.data` instead. 
 - If you switch scanners when configuring DataWedge, your highlighting rules will be lost (with this initial release)
 - As stated in the documentation, the keystroke output will concatenate all the data without any separators.  This means the Intent plugin is really the only viable way to receive data. 
 
 
 ## Freeform Image Capture
 
-Even if your device does not have a camera, you can now capture an image using the barcode scanner.  Any barcodes that have been seen during the capture session will be returned to your app along with the image. 
+Even if your device does not have a camera, you can now capture an image using the barcode scanner.  Any barcodes that have been seen during the capture session will be returned to your app along with the image (even if they are no longer in frame). 
 
 ### Possible uses of Freeform Image Capture
 
@@ -248,7 +250,8 @@ for (int i = 0; i < dataArray.length(); i++)
     String label = workflowObject.getString("label");
     if (label.equalsIgnoreCase(""))
     {
-      //  Each data decoded barcode is stored in workflowObject.getString("string_data")       
+      //  Each data decoded barcode is stored in workflowObject.getString("string_data")      
+      //  Symbology returned in workflowObject.getString("barcodetype")
     }
   }
   else
@@ -277,8 +280,8 @@ for (int i = 0; i < dataArray.length(); i++)
 
 There are two ways to configure freeform image capture in code.  This section is similar to the earlier section talking about configuring DataWedge for barcode highlighting but some of the detail is different.
 
-1. At Runtime:
-   
+**1. At Runtime:**
+
 As discussed in the "Coding and Barcode Highlighting: Configuring DataWedge" section, a new API has been introduced in DataWedge 11.2, [Switch Data Capture](https://techdocs.zebra.com/datawedge/11-2/guide/api/switchdatacapture/) to allow you to switch from 'regular' scanning to any of the workflow input options.  
    
 The full code example in the [help docs for Switch Data Capture](https://techdocs.zebra.com/datawedge/11-2/guide/api/switchdatacapture/#switchbetweenworkflowoptions) refers exclusively to ID cards.  For a freeform image capture example you can copy the format provided in the [Set Config Example](https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#setfreeformimagecaptureconfiguration):
@@ -304,8 +307,7 @@ i.putExtra("PARAM_LIST", paramList);
 sendBroadcast(i);
 ```
 
-
-2. Persistently:
+**2. Persistently:**
    
 A new section has been added to the existing SetConfig API for [Workflow Input Parameters](https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#workflowinputparameters).  
 
@@ -316,7 +318,16 @@ There is a [dedicated SetConfig example](https://techdocs.zebra.com/datawedge/11
 Registering for change in the workflow plugin status was covered earlier in the "Coding and Barcode Highlighting: Registering for change" section.  The code will be identical
 
 
+### Some additional notes for Freeform Image Capture:
+
+- The order the results are given will be the order in which the barcodes were seen by the decoding algorithm, this is will correspond to the order the user passed over them.
+- Captured Barcodes are reported via the Intent plugin as `com.symbol.datawedge.data`
+- If multiple barcodes are captured, the data will be concatenated, i.e. `com.symbol.datawedge.data_string` will return all data without any separators.  It is recommended to use `com.symbol.datawedge.data` instead. 
+- As stated in the documentation, the keystroke output will concatenate all the data without any separators.  This means the Intent plugin is really the only viable way to receive data. 
+
 ## OCR: License Plates, VIN, TIN, Meters
+
+https://techdocs.zebra.com/licensing/process/
 
 
 https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#setlicenseplateconfiguration
@@ -330,6 +341,8 @@ https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#setidentification
 
 
 ## Not to be confused with...
+
+**Even users familiar with DataWedge may confuse some of these new features with existing ones.  Below is a list of similar, though unrelated capabilities**
 
 - The Intent Output plugin setting for 'Use Content providers' is not used for Workflow or barcode highlighting
 - Similarly, although the principle is similar do not use the [content provider](https://techdocs.zebra.com/datawedge/latest/guide/programmers-guides/content-provider/) programming guide to extract images from the workflow data, instead use the [workflow programmer's guide](https://techdocs.zebra.com/datawedge/11-2/guide/programmers-guides/workflow-input/)
