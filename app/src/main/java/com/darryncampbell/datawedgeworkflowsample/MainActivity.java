@@ -33,20 +33,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //DWUtilities.CreateDWProfile(this);
+        DWUtilities.CreateDWProfile(this);
         DWUtilities.registerForNotifications(this, DWUtilities.NOTIFICATION_TYPE_SCANNER_STATUS);
         DWUtilities.registerForNotifications(this, DWUtilities.NOTIFICATION_TYPE_WORKFLOW_STATUS);
-
-        Intent initiatingIntent = getIntent();
-        if (initiatingIntent != null)
-        {
-            String action = initiatingIntent.getAction();
-            if (action.equalsIgnoreCase(getResources().getString(R.string.activity_intent_filter_action)))
-            {
-                //  Received a barcode through StartActivity
-                processScan(getApplicationContext(), initiatingIntent);
-            }
-        }
     }
 
     @Override
@@ -59,12 +48,11 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(DWUtilities.NOTIFICATION_ACTION);
         registerReceiver(myBroadcastReceiver, filter);
 
-        //  todo reinstate
-        //updateTextView(R.id.txtScannerStatus, "Waiting for Status");
-        //updateTextView(R.id.txtWorkflowStatus, "Waiting for Status");
-        //updateTextView(R.id.txtWorkflowResult, "Please Scan Barcode");
-        //updateTextView(R.id.txtDataString, "Please Scan Barcode");
-        //updateImage(R.id.img, null);
+        updateTextView(R.id.txtScannerStatus, "Waiting for Status");
+        updateTextView(R.id.txtWorkflowStatus, "Waiting for Status");
+        updateTextView(R.id.txtWorkflowResult, "Please Scan Barcode");
+        updateTextView(R.id.txtDataString, "Please Scan Barcode");
+        updateImage(R.id.img, null);
     }
 
     @Override
