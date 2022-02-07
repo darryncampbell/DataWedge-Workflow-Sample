@@ -18,10 +18,10 @@ OCR is a licensed feature, see the [licensing process](https://techdocs.zebra.co
 
 Documentation for these features are spread over multiple sections on the techdocs portal:
 
-- The [Workflow Input Plugin](https://techdocs.zebra.com/datawedge/11-2/guide/input/workflow/)
-- The [Barcode Highlighting Programmer's Guide](https://techdocs.zebra.com/datawedge/11-2/guide/programmers-guides/barcode-highlight/)
-- The [Workflow Programmer's Guide](https://techdocs.zebra.com/datawedge/11-2/guide/programmers-guides/workflow-input/)
-- The [Changes to the Notification API](https://techdocs.zebra.com/datawedge/11-2/guide/api/registerfornotification/) for Workflow
+- The [Workflow Input Plugin](https://techdocs.zebra.com/datawedge/latest/guide/input/workflow/)
+- The [Barcode Highlighting Programmer's Guide](https://techdocs.zebra.com/datawedge/latest/guide/programmers-guides/barcode-highlight/)
+- The [Workflow Programmer's Guide](https://techdocs.zebra.com/datawedge/latest/guide/programmers-guides/workflow-input/)
+- The [Changes to the Notification API](https://techdocs.zebra.com/datawedge/latest/guide/api/registerfornotification/) for Workflow
 - A [Code Walkthrough](https://youtu.be/dDCnVpmVbD0) by Zebra engineering on YouTube
 
 
@@ -84,7 +84,7 @@ The video also shows how the highlighting rules are configured with DataWedge.  
 
 ### Coding and Barcode Highlighting: Receiving Data
 
-Although part of the Barcode input plugin, barcode highlighting borrows a lot of its logic from the Workflow plugin.  What that means for you as a developer is you should follow the [Workflow programmer's guide](https://techdocs.zebra.com/datawedge/11-2/guide/programmers-guides/workflow-input/) to extract data returned from the Intent output plugin, **though there will be no image data**.
+Although part of the Barcode input plugin, barcode highlighting borrows a lot of its logic from the Workflow plugin.  What that means for you as a developer is you should follow the [Workflow programmer's guide](https://techdocs.zebra.com/datawedge/latest/guide/programmers-guides/workflow-input/) to extract data returned from the Intent output plugin, **though there will be no image data**.
 
 ```java
 //  Given the data returned via 'intent'
@@ -113,7 +113,7 @@ There are 2 ways to configure barcode highlighting in code
 
 **1. At Runtime:**
 
-A new API has been been introduced in DataWedge 11.2, [Switch Data Capture](https://techdocs.zebra.com/datawedge/11-2/guide/api/switchdatacapture/) to allow you to switch from 'regular' scanning, to barcode highlighting.  A full code example is given in the [help docs](https://techdocs.zebra.com/datawedge/11-2/guide/api/switchdatacapture/#switchbetweenbarcodescanningandhighlighting) but as a high level summary:
+A new API has been been introduced in DataWedge 11.2, [Switch Data Capture](https://techdocs.zebra.com/datawedge/latest/guide/api/switchdatacapture/) to allow you to switch from 'regular' scanning, to barcode highlighting.  A full code example is given in the [help docs](https://techdocs.zebra.com/datawedge/latest/guide/api/switchdatacapture/#switchbetweenbarcodescanningandhighlighting) but as a high level summary:
 
 ```java
 Intent i = new Intent();
@@ -149,17 +149,17 @@ I strongly recommend you copy / paste the example from techdocs and modify as ne
 
 **2. Persistently:**
 
-A new section has been added to the existing SetConfig API for [Barcode Highlighting Parameters](https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#barcodehighlightingparameters).  The format passed to SetConfig is very similar to that passed to the new 'Switch Data Capture' API, i.e. create a nested bundle structure for rules, actions and criteria.
+A new section has been added to the existing SetConfig API for [Barcode Highlighting Parameters](https://techdocs.zebra.com/datawedge/latest/guide/api/setconfig/#barcodehighlightingparameters).  The format passed to SetConfig is very similar to that passed to the new 'Switch Data Capture' API, i.e. create a nested bundle structure for rules, actions and criteria.
 
-For a full example of barcode highlighting through SetConfig please see the [Techdocs example](https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#setbarcodehighlightingparameters)
+For a full example of barcode highlighting through SetConfig please see the [Techdocs example](https://techdocs.zebra.com/datawedge/latest/guide/api/setconfig/#setbarcodehighlightingparameters)
 
 Again, I strongly recommend you copy / paste the example and modify as needed
 
 ### Coding and Barcode Highlighting: Registering for change
 
-The [RegisterForNotification](https://techdocs.zebra.com/datawedge/11-2/guide/api/registerfornotification/) API has been updated to report the status of the workflow plugin and since barcode highlighting is implemented by the workflow plugin (though presented separately on the UI) it follows the same lifecycle.
+The [RegisterForNotification](https://techdocs.zebra.com/datawedge/latest/guide/api/registerfornotification/) API has been updated to report the status of the workflow plugin and since barcode highlighting is implemented by the workflow plugin (though presented separately on the UI) it follows the same lifecycle.
 
-Register to receive the Workflow notifications.  See the [RegisterForNotification](https://techdocs.zebra.com/datawedge/11-2/guide/api/registerfornotification/) docs or this app for more detailed code:
+Register to receive the Workflow notifications.  See the [RegisterForNotification](https://techdocs.zebra.com/datawedge/latest/guide/api/registerfornotification/) docs or this app for more detailed code:
 
 ```java
 Bundle b = new Bundle();
@@ -181,7 +181,7 @@ case "WORKFLOW_STATUS":
 
 - Reporting will only report barcodes meeting the specified criteria currently highlighted in the viewfinder.  **If you want to capture barcodes outside the viewfinder, for example, if you are waving the device across multiple barcodes, then you should use the 'Freeform Image Capture' Workflow**.
 - Captured Barcodes are reported in the same way as "Workflow" data capture.  I.e. the Intent plugin will report the result through `com.symbol.datawedge.data`
-- The order the results are given will be the order in which the barcodes were recognised by the decoding algorithm, this is not something the user can influence.  An `identifier` field is returned in the JSONObject for each barcode captured.
+- The order the results are given will be the order in which the barcodes were recognized by the decoding algorithm, this is not something the user can influence.  An `identifier` field is returned in the JSONObject for each barcode captured.
 - If multiple barcodes are captured, the value returned in `com.symbol.datawedge.data_string` will be concatenated without any separators.  It is strongly recommended to use `com.symbol.datawedge.data` instead. 
 - If you switch scanners when configuring DataWedge, your highlighting rules will be lost (with this initial release)
 - As stated in the documentation, the keystroke output will concatenate all the data without any separators.  This means the Intent plugin is really the only viable way to receive data. 
@@ -236,7 +236,7 @@ This shows a brief scanning session with many barcodes in view.
 
 ### Coding and Freeform Image Capture: Receiving Data
 
-The [Workflow programmer's guide](https://techdocs.zebra.com/datawedge/11-2/guide/programmers-guides/workflow-input/) gives a lot of detail how to parse workflow return types.  The code applicable to freeform image capture is given below
+The [Workflow programmer's guide](https://techdocs.zebra.com/datawedge/latest/guide/programmers-guides/workflow-input/) gives a lot of detail how to parse workflow return types.  The code applicable to freeform image capture is given below
 
 ```java
 //  Given the data returned via 'intent'
@@ -282,9 +282,9 @@ There are two ways to configure freeform image capture in code.  This section is
 
 **1. At Runtime:**
 
-As discussed in the "Coding and Barcode Highlighting: Configuring DataWedge" section, a new API has been introduced in DataWedge 11.2, [Switch Data Capture](https://techdocs.zebra.com/datawedge/11-2/guide/api/switchdatacapture/) to allow you to switch from 'regular' scanning to any of the workflow input options.  
+As discussed in the "Coding and Barcode Highlighting: Configuring DataWedge" section, a new API has been introduced in DataWedge 11.2, [Switch Data Capture](https://techdocs.zebra.com/datawedge/latest/guide/api/switchdatacapture/) to allow you to switch from 'regular' scanning to any of the workflow input options.  
    
-The full code example in the [help docs for Switch Data Capture](https://techdocs.zebra.com/datawedge/11-2/guide/api/switchdatacapture/#switchbetweenworkflowoptions) refers exclusively to OCR.  For a freeform image capture example you can copy the format provided in the [Set Config Example](https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#setfreeformimagecaptureconfiguration):
+The full code example in the [help docs for Switch Data Capture](https://techdocs.zebra.com/datawedge/latest/guide/api/switchdatacapture/#switchbetweenworkflowoptions) refers exclusively to OCR.  For a freeform image capture example you can copy the format provided in the [Set Config Example](https://techdocs.zebra.com/datawedge/latest/guide/api/setconfig/#setfreeformimagecaptureconfiguration):
 
 ```java
 Intent i = new Intent();
@@ -309,9 +309,9 @@ sendBroadcast(i);
 
 **2. Persistently:**
    
-A new section has been added to the existing SetConfig API for [Workflow Input Parameters](https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#workflowinputparameters).  
+A new section has been added to the existing SetConfig API for [Workflow Input Parameters](https://techdocs.zebra.com/datawedge/latest/guide/api/setconfig/#workflowinputparameters).  
 
-There is a [dedicated SetConfig example](https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#setfreeformimagecaptureconfiguration) for freeform image capture.
+There is a [dedicated SetConfig example](https://techdocs.zebra.com/datawedge/latest/guide/api/setconfig/#setfreeformimagecaptureconfiguration) for freeform image capture.
 
 ### Coding and Freeform Image Capture: Registering for change
 
@@ -353,6 +353,8 @@ DataWedge 11.2 introduces the first "Early Access" version of OCR for real world
 
 All these OCR features, with the exception of identity documents, are handled in a consistent way by DataWedge, so this section will group them together.
 
+For more information on DataWedge OCR, please see the [Techdocs help page](https://techdocs.zebra.com/datawedge/latest/guide/input/workflow/#ocr)
+
 ### Possible uses for OCR (License Plates, VIN, TIN, Meters)
 
 Unlike standard OCR, DataWedge OCR is designed with specific use cases in mind.  With knowledge of what is being scanned, it can make the recognition process quicker and more reliable.
@@ -365,7 +367,7 @@ You can include DataWedge OCR into your existing workflow.  For example:
 
 ### How to configure OCR (License Plates, VIN, TIN, Meters)
 
-All OCR will follow some common configuration along with some special considerations depending on what is being recognised.
+All OCR will follow some common configuration along with some special considerations depending on what is being recognized.
 
 To configure OCR, configure your DataWedge profile as follows:
 
@@ -373,7 +375,7 @@ To configure OCR, configure your DataWedge profile as follows:
 2. Scroll down to the OCR type you want and enable it.
 3. Press the  ellipsis to bring up additional parameters
 4. Choose the input source, either camera or imager
-5. Set the session timeout, in ms.  This is the length of time that the scan engine will try to recognise the object in view.  I recommend setting this to about 10 seconds.
+5. Set the session timeout, in ms.  This is the length of time that the scan engine will try to recognize the object in view.  I recommend setting this to about 10 seconds.
 6. Set the Illumination (useful in low light conditions at the trade-off of increased battery use during recognition) and whether each scan will send an image along with the results ('Output Image').
 7. Set the Feedback Parameters, such as haptic feedback, LED notification and decode audio feedback. This is the feedback that will be given when recogition is complete.
 
@@ -383,7 +385,7 @@ To configure OCR, configure your DataWedge profile as follows:
 
 #### Special considerations for License Plates
 
-Only certain country's license plates are supported.  At the time of writing the majority of US states plus the majority of EMEA countries are supported.  For the most recent list of supported plates, please see [TechDocs](https://techdocs.zebra.com/datawedge/11-2/guide/input/workflow/#licenseplatessupported).
+Only certain country's license plates are supported.  At the time of writing the majority of US states plus the majority of EMEA countries are supported.  For the most recent list of supported plates, please see [TechDocs](https://techdocs.zebra.com/datawedge/latest/guide/input/workflow/#licenseplatessupported).
 
 License plate configuration includes an additional option, Region selection, to aid recognition.
 
@@ -392,11 +394,11 @@ License plate configuration includes an additional option, Region selection, to 
 
 #### Special considerations for VIN
 
-There are no additional settings for VIN.  A VIN of 17 characters will be recognized, orientated horizontally or vertically.  See [TechDocs](https://techdocs.zebra.com/datawedge/11-2/guide/input/workflow/#vehicleidentificationnumbervin) for more information.
+There are no additional settings for VIN.  A VIN of 17 characters will be recognized, orientated horizontally or vertically.  See [TechDocs](https://techdocs.zebra.com/datawedge/latest/guide/input/workflow/#vehicleidentificationnumbervin) for more information.
 
 #### Special considerations for TIN
 
-Only certain tyre standards are supported.  At the time of writing, this is just US DOT (department of transport) standards 1 and 2 but the international standard will be supported in a subsequent release.  For the most recent list of supported tyre standards, please see [TechDocs](https://techdocs.zebra.com/datawedge/11-2/guide/input/workflow/#tireidentificationnumbertin).
+Only certain tyre standards are supported.  At the time of writing, this is just US DOT (department of transport) standards 1 and 2 but the international standard will be supported in a subsequent release.  For the most recent list of supported tyre standards, please see [TechDocs](https://techdocs.zebra.com/datawedge/latest/guide/input/workflow/#tireidentificationnumbertin).
 
 TIN configuration includes an additional option, the standard to use in recognition.
 
@@ -404,7 +406,7 @@ TIN configuration includes an additional option, the standard to use in recognit
 
 #### Special considerations for Meters
 
-All standard meter types are supported: Analog, dial and digital meter readers.  For more information, see [TechDocs](https://techdocs.zebra.com/datawedge/11-2/guide/input/workflow/#meter) which also includes additional restrictions for each type of meter.
+All standard meter types are supported: Analog, dial and digital meter readers.  For more information, see [TechDocs](https://techdocs.zebra.com/datawedge/latest/guide/input/workflow/#meter) which also includes additional restrictions for each type of meter.
 
 To aid recognition, it is necessary to tell DataWedge whether you are scanning a dial-based meter or not:
 
@@ -414,9 +416,9 @@ To aid recognition, it is necessary to tell DataWedge whether you are scanning a
 ### How to use OCR (License Plates, VIN, TIN, Meters)
 
 - The hardware or software trigger will initiate the data acquisition session
-- As the system performs OCR, it will highlight the area it is recognising
-- Once recognised, the data will be returned to the calling app.  Do **NOT** press the trigger to capture data.  This differs from freeform image capture which does require you to press the trigger.
-- If nothing was recognised before the timeout, no data is sent to the calling app.
+- As the system performs OCR, it will highlight the area it is recognizing
+- Once recognized, the data will be returned to the calling app.  Do **NOT** press the trigger to capture data.  This differs from freeform image capture which does require you to press the trigger.
+- If nothing was recognized before the timeout, no data is sent to the calling app.
 
 ### Video Demos of OCR (License Plates, VIN, TIN, Meters)
 
@@ -440,15 +442,15 @@ The technical and marketing teams have already gone through the effort of postin
 
 ### Coding and OCR (License Plates, VIN, TIN, Meters): Receiving Data
 
-Parsing OCR results is very similar to how Freeform image capture results are parsed, as explained previously and the [Workflow programmer's guide](https://techdocs.zebra.com/datawedge/11-2/guide/programmers-guides/workflow-input/#ocrresultoutput) is the best place to start understanding either.
+Parsing OCR results is very similar to how Freeform image capture results are parsed, as explained previously and the [Workflow programmer's guide](https://techdocs.zebra.com/datawedge/latest/guide/programmers-guides/workflow-input/#ocrresultoutput) is the best place to start understanding either.
 
-Most importantly for OCR, please refer to the ['OCR Result Output'](https://techdocs.zebra.com/datawedge/11-2/guide/programmers-guides/workflow-input/#ocrresultoutput) section of the Workflow programmer's guide as that gives specific information about parsing the received OCR value.
+Most importantly for OCR, please refer to the ['OCR Result Output'](https://techdocs.zebra.com/datawedge/latest/guide/programmers-guides/workflow-input/#ocrresultoutput) section of the Workflow programmer's guide as that gives specific information about parsing the received OCR value.
 
 License plates, VIN, TIN and meters will all return a single String data value representing the recognized value, contained within the `string_data` field.  How you parse which value is returned can be done as follows:
 
 ```java
 //  Given the data is returned via 'intent
-String data = intent.getStringExtra(getResources().getString(R.string.datawedge_intent_key_data));
+String data = intent.getStringExtra("com.symbol.datawedge.decode_data");
 JSONArray dataArray = new JSONArray(data);
 for (int i = 0; i < dataArray.length(); i++)
 {
@@ -489,9 +491,9 @@ There are two ways to configure OCR in code.  This section is similar to the ear
 
 **1. At Runtime:**
 
-As discussed previously, a new API has been introduced in DataWedge 11.2 [Switch Data Capture](https://techdocs.zebra.com/datawedge/11-2/guide/api/switchdatacapture/) to allow you to switch from 'regular' scanning to any of the workflow input options.
+As discussed previously, a new API has been introduced in DataWedge 11.2 [Switch Data Capture](https://techdocs.zebra.com/datawedge/latest/guide/api/switchdatacapture/) to allow you to switch from 'regular' scanning to any of the workflow input options.
 
-The full code example in the [help docs for Switch Data Capture](https://techdocs.zebra.com/datawedge/11-2/guide/api/switchdatacapture/#switchbetweenworkflowoptions) shows how to switch to OCR (meter reading) and should be treated as the authoritative source but is summarized below:
+The full code example in the [help docs for Switch Data Capture](https://techdocs.zebra.com/datawedge/latest/guide/api/switchdatacapture/#switchbetweenworkflowoptions) shows how to switch to OCR (meter reading) and should be treated as the authoritative source but is summarized below:
 
 ```java
 Intent i = new Intent();
@@ -518,24 +520,24 @@ sendBroadcast(i);
 
 **2. Persistently:**
 
-A new section has been added to the existing SetConfig API for [Workflow Input](https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#workflowinputparameters).  The format passed to SetConfig is very similar to that passed to the new 'Switch Data Capture' API, i.e. create a nested bundle structure for rules, actions and criteria.
+A new section has been added to the existing SetConfig API for [Workflow Input](https://techdocs.zebra.com/datawedge/latest/guide/api/setconfig/#workflowinputparameters).  The format passed to SetConfig is very similar to that passed to the new 'Switch Data Capture' API, i.e. create a nested bundle structure for rules, actions and criteria.
 
-**Important:** Do not confuse the Workflow Input parameters for OCR with the [OCR Parameters](https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#ocrparameters) that apply only to the barcode input plugin and support freeform recognition of OCR_A and OCR_B typefaces.
+**Important:** Do not confuse the Workflow Input parameters for OCR with the [OCR Parameters](https://techdocs.zebra.com/datawedge/latest/guide/api/setconfig/#ocrparameters) that apply only to the barcode input plugin and support freeform recognition of OCR_A and OCR_B typefaces.
 
 There are dedicated examples available in TechDocs to configure OCR:
 
-- [Set License Plate Recognition Configuration](https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#setlicenseplateconfiguration)
-- [Set VIN Recognition Configuration](https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#setvehicleidentificationnumbervinconfiguration)
-- [Set TIN Recognition Configuration](https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#settireidentificationnumbertinconfiguration)
-- [Set Meter Recognition Configuration](https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#setmeterconfiguration)
+- [Set License Plate Recognition Configuration](https://techdocs.zebra.com/datawedge/latest/guide/api/setconfig/#setlicenseplateconfiguration)
+- [Set VIN Recognition Configuration](https://techdocs.zebra.com/datawedge/latest/guide/api/setconfig/#setvehicleidentificationnumbervinconfiguration)
+- [Set TIN Recognition Configuration](https://techdocs.zebra.com/datawedge/latest/guide/api/setconfig/#settireidentificationnumbertinconfiguration)
+- [Set Meter Recognition Configuration](https://techdocs.zebra.com/datawedge/latest/guide/api/setconfig/#setmeterconfiguration)
 
 ### Coding and OCR (License Plates, VIN, TIN, Meters): Registering for Change
 
 Registering for change in the workflow plugin status was covered earlier in the "Coding and Barcode Highlighting: Registering for change" section. The code will be identical:
 
-> The [RegisterForNotification](https://techdocs.zebra.com/datawedge/11-2/guide/api/registerfornotification/) API has been updated to report the status of the workflow plugin.
+> The [RegisterForNotification](https://techdocs.zebra.com/datawedge/latest/guide/api/registerfornotification/) API has been updated to report the status of the workflow plugin.
 
-> Register to receive the Workflow notifications.  See the [RegisterForNotification](https://techdocs.zebra.com/datawedge/11-2/guide/api/registerfornotification/) docs or this app for more detailed code:
+> Register to receive the Workflow notifications.  See the [RegisterForNotification](https://techdocs.zebra.com/datawedge/latest/guide/api/registerfornotification/) docs or this app for more detailed code:
 
 ```java
 Bundle b = new Bundle();
@@ -562,28 +564,112 @@ case "WORKFLOW_STATUS":
 
 ## OCR: Identity Documents
 
+DataWedge 11.2 introduces OCR for identity documents which at launch are: 
+
+- National ID cards
+- Driving licenses
+
+There are many similarities between OCR for identity documents and other types of DataWedge Workflow OCR, so this section will concentrate on where ID cards differ from processing license plates, VIN, TIN and meters.
+
+For more information on DataWedge OCR, please see the [Techdocs help page](https://techdocs.zebra.com/datawedge/latest/guide/input/workflow/#identificationdocument)
+
 ### Possible uses for OCR (Identity Documents)
+
+Quickly scan and recognize the text in a large number of supported ID cards.
+
+At launch this will cover a selection of drivers licenses & identification cards across the following:
+
+- United States
+- Canada
+- LATAM (Mexico)
+- EMEA and EU (selected countries)
+- Africa (selected countries)
+- Australia (selected territories)
+
+**This list is ever increasing**, please refer to the supported list on [TechDocs](https://techdocs.zebra.com/datawedge/latest/guide/input/workflow/#identificationdocument) for up to date information.
 
 ### How to configure OCR (Identity Documents)
 
+All OCR will follow some common configuration along with some special considerations depending on what is being recognized.  Please refer to the previous section which described how to configure OCR with DataWedge
+
+#### Special considerations for ID cards
+
+At the time of writing there are no special configuration options for recognizing ID cards.  Any supported ID card placed in the field of view will be recognized.
+
 ### How to use OCR (Identity Documents)
+
+- The hardware or software trigger will initiate the data acquisition session
+- As the system performs OCR, it will highlight the area it is recognizing
+- Once recognized, the data will be returned to the calling app. Do **NOT** press the trigger to capture data.
+- If nothing was recognized before the timeout, no data is sent to the calling app.
 
 ### Video Demos of OCR (Identity Documents)
 
-[![OCR: ](https://img.youtube.com/vi/XwY9l32bk94/0.jpg)](https://www.youtube.com/watch?v=XwY9l32bk94)
+The technical and marketing teams have already gone through the effort of posting a short demo for ID card OCR to YouTube, please find this below:
 
-
+[![OCR: Identity documents](https://img.youtube.com/vi/XwY9l32bk94/0.jpg)](https://www.youtube.com/watch?v=XwY9l32bk94)
 
 ### Coding and OCR (Identity Documents): Receiving Data
 
+The primary difference between OCR for identity documents and OCR for other objects is how DataWedge will parse the data for you.  Whereas other objects return a single, recognized `string_data` result, Identity cards will return upwards of 55 different attributes related to the card.
+
+Obviously no single card will contain all of these attributes as the possible fields are designed to cover every card type but the full list of fields is given in the [workflow programming guide](https://techdocs.zebra.com/datawedge/latest/guide/programmers-guides/workflow-input/#ocrresultoutput).
+
+To detect that an ID card has been scanned, use a `label` known to exist in that identity card , for example 'lastName'.  Then parse the entire returned JSON object:
+
+```java
+String data = intent.getStringExtra("com.symbol.datawedge.decode_data");
+Log.d(LOG_TAG, "Decode Data: " + data);
+if (data != null)
+{
+  JSONArray dataArray = new JSONArray(data);
+  for (int i = 0; i < dataArray.length(); i++)
+  {
+    JSONObject workflowObject = dataArray.getJSONObject(i);
+    if (workflowObject.has("string_data"))
+    {
+      String label = workflowObject.getString("label");
+      if (label.equalsIgnoreCase("lastName"))
+      {
+        parseIdentityDocument(dataArray);
+        break;
+      }
+      //  else if other type of OCR
+    }
+  }
+}
+```
+
+Then to parse the identity document:
+
+```java
+private void parseIdentityDocument(JSONArray dataArray) throws JSONException {
+  String lastName = "?";
+  String firstName = "?";
+  for (int i = 0; i < dataArray.length(); i++)
+  {
+    JSONObject workflowObject = dataArray.getJSONObject(i);
+    if (workflowObject.has("string_data")) 
+    {
+      String label = workflowObject.getString("label");
+        if (label.equalsIgnoreCase("lastName"))
+          lastName = workflowObject.getString("string_data");
+        else if (label.equalsIgnoreCase("firstName"))
+          firstName = workflowObject.getString("string_data");
+        //  else if / case ... for each of the other possible parameters
+    }
+  }
+  Log.d(TAG, "First Name: " + firstName + ", Last Name: " + lastName);
+}
+```
 
 ### Coding and OCR (Identity Documents): Configuring DataWedge
 
 **1. At Runtime:**
 
-As discussed previously, a new API has been introduced in DataWedge 11.2 [Switch Data Capture](https://techdocs.zebra.com/datawedge/11-2/guide/api/switchdatacapture/) to allow you to switch from 'regular' scanning to any of the workflow input options.
+As discussed previously, a new API has been introduced in DataWedge 11.2 [Switch Data Capture](https://techdocs.zebra.com/datawedge/latest/guide/api/switchdatacapture/) to allow you to switch from 'regular' scanning to any of the workflow input options.
 
-The full code example in the [help docs for Switch Data Capture](https://techdocs.zebra.com/datawedge/11-2/guide/api/switchdatacapture/#switchbetweenworkflowoptions) shows how to switch to OCR (ID cards) and should be treated as the authoritative source but is summarized below:
+The full code example in the [help docs for Switch Data Capture](https://techdocs.zebra.com/datawedge/latest/guide/api/switchdatacapture/#switchbetweenworkflowoptions) shows how to switch to OCR (ID cards) and should be treated as the authoritative source but is summarized below:
 
 ```java
 Intent i = new Intent();
@@ -610,15 +696,15 @@ sendBroadcast(i);
 
 **2. Persistently:**
 
-https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#setidentificationdocumentconfiguration
+A new section has been added to the existing SetConfig API for [Workflow Input](https://techdocs.zebra.com/datawedge/latest/guide/api/setconfig/#workflowinputparameters).  There are no special considerations for Identity cards when calling SetConfig, and an example is available on [TechDocs](https://techdocs.zebra.com/datawedge/latest/guide/api/setconfig/#setidentificationdocumentconfiguration) which can be used as a template.
 
 ### Coding and OCR (Identity Documents): Registering for Change
 
 Registering for change in the workflow plugin status was covered earlier in the "Coding and Barcode Highlighting: Registering for change" section. The code will be identical:
 
-> The [RegisterForNotification](https://techdocs.zebra.com/datawedge/11-2/guide/api/registerfornotification/) API has been updated to report the status of the workflow plugin.
+> The [RegisterForNotification](https://techdocs.zebra.com/datawedge/latest/guide/api/registerfornotification/) API has been updated to report the status of the workflow plugin.
 
-> Register to receive the Workflow notifications.  See the [RegisterForNotification](https://techdocs.zebra.com/datawedge/11-2/guide/api/registerfornotification/) docs or this app for more detailed code:
+> Register to receive the Workflow notifications.  See the [RegisterForNotification](https://techdocs.zebra.com/datawedge/latest/guide/api/registerfornotification/) docs or this app for more detailed code:
 
 ```java
 Bundle b = new Bundle();
@@ -638,7 +724,9 @@ case "WORKFLOW_STATUS":
 
 ### Some additional notes for OCR (Identity Documents)
 
-
+- Passports, Visas are not supported through DataWedge OCR through the Workflow input plugin but you can still use the [barcode input plugin OCR capabilities](https://techdocs.zebra.com/datawedge/11-2/guide/input/barcode/#ocrparams) which recognizes the OCR_A and OCR_B typefaces.
+- Performance may be impacted by reflections, lighting conditions, dirt, abrasion, poor background contrast
+- Some accented characters are not yet supported, e.g. ñ or á but support is coming in the future. 
 
 
 ## Not to be confused with...
@@ -646,7 +734,7 @@ case "WORKFLOW_STATUS":
 **Even users familiar with DataWedge may confuse some of these new features with existing ones.  Below is a list of similar, though unrelated capabilities**
 
 - The Intent Output plugin setting for 'Use Content providers' is not used for Workflow or barcode highlighting
-- Similarly, although the principle is similar do not use the [content provider](https://techdocs.zebra.com/datawedge/latest/guide/programmers-guides/content-provider/) programming guide to extract images from the workflow data, instead use the [workflow programmer's guide](https://techdocs.zebra.com/datawedge/11-2/guide/programmers-guides/workflow-input/)
+- Similarly, although the principle is similar do not use the [content provider](https://techdocs.zebra.com/datawedge/latest/guide/programmers-guides/content-provider/) programming guide to extract images from the workflow data, instead use the [workflow programmer's guide](https://techdocs.zebra.com/datawedge/latest/guide/programmers-guides/workflow-input/)
 - The "OCR params" under "Scanner Configuration" is something separate and not related to the OCR feature of workflow.
 
 
