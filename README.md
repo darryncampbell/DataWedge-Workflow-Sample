@@ -290,19 +290,19 @@ The full code example in the [help docs for Switch Data Capture](https://techdoc
 Intent i = new Intent();
 i.putExtra("com.symbol.datawedge.api.SWITCH_DATACAPTURE", "WORKFLOW");
 Bundle paramList = new Bundle();
-paramList.putString("workflow_name","free_form_capture");
-paramList.putString("workflow_input_source","2");
-Bundle paramSet1 = new Bundle();
-paramSet1.putString("module","BarcodeTrackerModule");
-Bundle moduleAParams = new Bundle();
-moduleContainerDecoderModule.putString("session_timeout", "16000");
-moduleContainerDecoderModule.putString("illumination", "off");
-moduleContainerDecoderModule.putString("decode_and_highlight_barcodes", "1");
-paramSet1.putBundle("module_params",moduleAParams);
-//  Feedback params omitted from this code sample
-ArrayList<Bundle> paramSetList = new ArrayList<>();
-paramSetList.add(paramSet1);
-paramList.putParcelableArrayList("workflow_params", paramSetList);
+  paramList.putString("workflow_name","free_form_capture");
+  paramList.putString("workflow_input_source","2");
+  Bundle paramSetContainerDecoderModule = new Bundle();
+    paramSetContainerDecoderModule.putString("module","BarcodeTrackerModule");
+    Bundle moduleContainerDecoderModule = new Bundle();
+      moduleContainerDecoderModule.putString("session_timeout", "16000");
+      moduleContainerDecoderModule.putString("illumination", "off");
+      moduleContainerDecoderModule.putString("decode_and_highlight_barcodes", "1");
+    paramSetContainerDecoderModule.putBundle("module_params",moduleAParams);
+    //  Feedback params omitted from this code sample
+  ArrayList<Bundle> paramSetList = new ArrayList<>();
+  paramSetList.add(paramSetContainerDecoderModule);
+  paramList.putParcelableArrayList("workflow_params", paramSetList);
 i.putExtra("PARAM_LIST", paramList);
 sendBroadcast(i);
 ```
@@ -325,19 +325,150 @@ Registering for change in the workflow plugin status was covered earlier in the 
 - If multiple barcodes are captured, the data will be concatenated, i.e. `com.symbol.datawedge.data_string` will return all data without any separators.  It is recommended to use `com.symbol.datawedge.data` instead. 
 - As stated in the documentation, the keystroke output will concatenate all the data without any separators.  This means the Intent plugin is really the only viable way to receive data. 
 
+## Licensing OCR
+
+All DataWedge OCR features delivered via the Workflow plugin require a license.  Each OCR feature is licensed individually and is term-based (at the time of writing, 1 or 2 years).  Please contact your Zebra reseller to obtain licenses.
+
+![DW OCR Overview](https://github.com/darryncampbell/DataWedge-Workflow-Sample/raw/main/media/ocr/dw_ocr_overview.png)
+
+More information about licensing is available on [TechDocs](https://techdocs.zebra.com/licensing/process/) but in summary:
+
+- You obtain a license file through a Zebra reseller or, in some cases, through Zebra directly.  Evaluation licenses are also available to experiment with the feature prior to purchase.
+- Access the license system to download the `.bin` file associated with your license(s)
+- Apply the license to the device(s), either manually through the device UI or through mass-deployment using StageNow or your EMM.
+
+Note: OCR licensing uses the same licensing mechanism used elsewhere for Zebra Android value-adds, known as Mobility DNA licensing.  If you have already used licensing with other tools like Enterprise Browser, or to add enterprise features to value-tier devices you should find OCR licensing familiar.
+
+**You can experiment with all OCR features using DWDemo without obtaining any kind of license**
+
 ## OCR: License Plates, VIN, TIN, Meters
 
-https://techdocs.zebra.com/licensing/process/
+DataWedge 11.2 introduces the first "Early Access" version of OCR for real world objects:
 
+- License Plates
+- Vehicle Identification Numbers (VIN)
+- Tyre Identification Numbers (TIN)
+- Meters (digital or analog dials e.g. gas or electric meters)
+- Identification documents such as drivers licenses or National identity card card. 
+
+All these OCR features, with the exception of identity documents, are handled in a consistent way by DataWedge, so this section will group them together.
+
+### Possible uses for OCR (License Plates, VIN, TIN, Meters)
+
+Unlike standard OCR, DataWedge OCR is designed with specific use cases in mind.  With knowledge of what is being scanned, it can make the recognition process quicker and more reliable.
+
+You can include DataWedge OCR into your existing workflow.  For example:
+
+- Returning a rental car could involve scanning the license plate and VIN rather than keying them in.
+- On-site surveys requiring meter-reading could be made more efficient and less prone to keying errors
+-  Scanning the TIN will make changing tyres more efficient and less error-prone.
+
+### How to configure OCR (License Plates, VIN, TIN, Meters)
+
+All OCR will follow some common configuration along with some special considerations depending on what is being recognised.
+
+To configure OCR, configure your DataWedge profile as follows:
+
+1. Enable the Workflow input plugin.  If doing this through the DataWedge UI, you will be prompted that you cannot have both the Barcode and Workflow input plugins active.
+2. Scroll down to the OCR type you want and enable it.
+3. Press the  ellipsis to bring up additional parameters
+4. Choose the input source, either camera or imager
+5. Set the session timeout, in ms.  This is the length of time that the scan engine will try to recognise the object in view.  I recommend setting this to about 10 seconds.
+6. Set the Illumination (useful in low light conditions at the trade-off of increased battery use during recognition) and whether each scan will send an image along with the results ('Output Image').
+7. Set the Feedback Parameters, such as haptic feedback, LED notification and decode audio feedback. This is the feedback that will be given when recogition is complete.
+
+![DW OCR Config](https://github.com/darryncampbell/DataWedge-Workflow-Sample/raw/main/media/ocr/dw_ocr_config.png)
+
+*OCR Configuration for VIN, though the options will be similar for all OCR types.* 
+
+#### Special considerations for License Plates
+
+Only certain country's license plates are supported.  At the time of writing the majority of US states plus the majority of EMEA countries are supported.  For the most recent list of supported plates, please see [TechDocs](https://techdocs.zebra.com/datawedge/11-2/guide/input/workflow/#licenseplatessupported).
+
+License plate configuration includes an additional option, Region selection, to aid recognition.
+
+![DW OCR License Plates](https://github.com/darryncampbell/DataWedge-Workflow-Sample/raw/main/media/ocr/dw_ocr_config_license_plate.png)
+
+
+#### Special considerations for VIN
+
+There are no additional settings for VIN.  A VIN of 17 characters will be recognized, orientated horizontally or vertically.  See [TechDocs](https://techdocs.zebra.com/datawedge/11-2/guide/input/workflow/#vehicleidentificationnumbervin) for more information.
+
+#### Special considerations for TIN
+
+Only certain tyre standards are supported.  At the time of writing, this is just US DOT (department of transport) standards 1 and 2 but the international standard will be supported in a subsequent release.  For the most recent list of supported tyre standards, please see [TechDocs](https://techdocs.zebra.com/datawedge/11-2/guide/input/workflow/#tireidentificationnumbertin).
+
+TIN configuration includes an additional option, the standard to use in recognition.
+
+![DW OCR TIN](https://github.com/darryncampbell/DataWedge-Workflow-Sample/raw/main/media/ocr/dw_ocr_config_tin.png)
+
+#### Special considerations for Meters
+
+All standard meter types are supported: Analog, dial and digital meter readers.  For more information, see [TechDocs](https://techdocs.zebra.com/datawedge/11-2/guide/input/workflow/#meter) which also includes additional restrictions for each type of meter.
+
+To aid recognition, it is necessary to tell DataWedge whether you are scanning a dial-based meter or not:
+
+![DW OCR Meters](https://github.com/darryncampbell/DataWedge-Workflow-Sample/raw/main/media/ocr/dw_ocr_config_meter.png)
+
+
+### How to use OCR (License Plates, VIN, TIN, Meters)
+
+- The hardware or software trigger will initiate the data acquisition session
+- As the system performs OCR, it will highlight the area it is recognising
+- Once recognised, the data will be returned to the calling app.  Do **NOT** press the trigger to capture data.  This differs from freeform image capture which does require you to press the trigger.
+- If nothing was recognised before the timeout, no data is sent to the calling app.
+
+### Video Demos of OCR (License Plates, VIN, TIN, Meters)
+
+### Coding and OCR (License Plates, VIN, TIN, Meters): Receiving Data
+
+
+### Coding and OCR (License Plates, VIN, TIN, Meters): Configuring DataWedge
+
+**1. At Runtime:**
+
+**2. Persistently:**
 
 https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#setlicenseplateconfiguration
 https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#setvehicleidentificationnumbervinconfiguration
 https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#settireidentificationnumbertinconfiguration
 https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#setmeterconfiguration
 
+### Coding and OCR (License Plates, VIN, TIN, Meters): Registering for Change
+
+### Some additional notes for OCR (License Plates, VIN, TIN, Meters)
+
+
+
+
+
+
 ## OCR: Identity Documents
 
+### Possible uses for OCR (Identity Documents)
+
+### How to configure OCR (Identity Documents)
+
+### How to use OCR (Identity Documents)
+
+### Video Demos of OCR (Identity Documents)
+
+### Coding and OCR (Identity Documents): Receiving Data
+
+
+### Coding and OCR (Identity Documents): Configuring DataWedge
+
+**1. At Runtime:**
+
+**2. Persistently:**
+
 https://techdocs.zebra.com/datawedge/11-2/guide/api/setconfig/#setidentificationdocumentconfiguration
+
+### Coding and OCR (Identity Documents): Registering for Change
+
+### Some additional notes for OCR (Identity Documents)
+
+
 
 
 ## Not to be confused with...

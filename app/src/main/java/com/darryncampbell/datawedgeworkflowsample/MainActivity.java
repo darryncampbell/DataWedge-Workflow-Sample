@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         DWUtilities.CreateDWProfile(this);
         DWUtilities.registerForNotifications(this, DWUtilities.NOTIFICATION_TYPE_SCANNER_STATUS);
         DWUtilities.registerForNotifications(this, DWUtilities.NOTIFICATION_TYPE_WORKFLOW_STATUS);
+
     }
 
     @Override
