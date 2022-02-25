@@ -179,7 +179,7 @@ case "WORKFLOW_STATUS":
 
 ### Some additional notes for Barcode Highlighting:
 
-- Reporting will only report barcodes meeting the specified criteria currently highlighted in the viewfinder.  **If you want to capture barcodes outside the viewfinder, for example, if you are waving the device across multiple barcodes, then you should use the 'Freeform Image Capture' Workflow**.
+- Reporting will only report barcodes meeting the specified criteria currently highlighted in the viewfinder.  **If you want to capture barcodes outside the viewfinder, for example, if you are waving the device across multiple barcodes, then you should use the 'Free-Form Image Capture' Workflow**.
 - Captured Barcodes are reported in the same way as "Workflow" data capture.  I.e. the Intent plugin will report the result through `com.symbol.datawedge.data`
 - The order the results are given will be the order in which the barcodes were recognized by the decoding algorithm, this is not something the user can influence.  An `identifier` field is returned in the JSONObject for each barcode captured.
 - If multiple barcodes are captured, the value returned in `com.symbol.datawedge.data_string` will be concatenated without any separators.  It is strongly recommended to use `com.symbol.datawedge.data` instead. 
@@ -187,18 +187,18 @@ case "WORKFLOW_STATUS":
 - As stated in the documentation, the keystroke output will concatenate all the data without any separators.  This means the Intent plugin is really the only viable way to receive data. 
 
 
-## Freeform Image Capture
+## Free-Form Image Capture
 
 Even if your device does not have a camera, you can now capture an image using the barcode scanner.  Any barcodes that have been seen during the capture session will be returned to your app along with the image (even if they are no longer in frame). 
 
-### Possible uses of Freeform Image Capture
+### Possible uses of Free-Form Image Capture
 
 - Capture an image through the device imager (scanner), without a camera.
 - Capture proof of delivery and the tracking barcode in a single step
 
-### How to configure Freeform Image Capture
+### How to configure Free-Form Image Capture
 
-Freeform Image capture is delivered through a new DataWedge input plugin called 'Workflow'.  This is separate from the standard 'Barcode' input plugin.
+Free-Form Image capture is delivered through a new DataWedge input plugin called 'Workflow'.  This is separate from the standard 'Barcode' input plugin.
 
 To configure freeform image capture, configure your DataWedge profile as follows:
 
@@ -206,35 +206,35 @@ To configure freeform image capture, configure your DataWedge profile as follows
 2. Scroll down to the 'Image Capture' section of the plugin and enable it.
 3. Press the ellipsis to bring up additional parameters
 4. Choose the input source, either camera or imager
-5. Set the session timeout, in ms.  This is the length of time the scanning session will be held open until cancelled, if the trigger was not pulled.
+5. Set the session timeout, in ms.  This is the length of time the scanning session will be held open, if the trigger was not pulled.
 6. Select 'Decode And Highlight Barcodes' to return data.  Although set to 'Highlight' only by default, most use cases will also want to return data.
-7. Set the additional feedback parameters, such as haptic feedback, LED notification and decode audio feedback.  This is the feedback that will be given whenever a new barcode is seen in the viewfinder, so as you pan across multiple barcodes your device will inform you whenever it sees a barcode. 
+7. Set the additional feedback parameters, such as haptic feedback, LED notification and decode audio feedback.  This is the feedback that will be given whenever a new barcode is seen in the viewfinder, so as you pan across multiple barcodes your device will tell you whenever it sees a barcode. 
 
-![Freeform Image Configuration](https://github.com/darryncampbell/DataWedge-Workflow-Sample/raw/main/media/dw_freeform_image_capture_config_1.png)
+![Free-Form Image Configuration](https://github.com/darryncampbell/DataWedge-Workflow-Sample/raw/main/media/dw_freeform_image_capture_config_1.png)
 
-### How to use Freeform Image Capture
+### How to use Free-Form Image Capture
 
 - The hardware or software trigger will initiate the data acquisition session
 - As the system sees barcodes, it will highlight them to let the user know it has been seen.  Note: it is NOT possible to change the highlight colour with freeform image capture.
-- The next trigger press will capture the image, so the user can step back if need be, to ensure the entire object is within view.
-- If the 'Decode / Highlight' option is turned on, it will return the image and the barcodes that had been highlighted.
+- The next trigger press will capture the image.  The user can step back if need be, to ensure the entire object is within view.
+- If the 'Decode / Highlight' option is turned on, barcodes that had been highlighted along with the image will be returned.
 
-### Video Demos of Freeform Image Capture
+### Video Demos of Free-Form Image Capture
 
-**The following video shows freeform image capture with barcode highlighting via the Camera:**
+**The following video shows free-form image capture via the Imager:**
 
-This shows panning across many barcodes during a long scanning session.
+This is a brief scanning session with many barcodes in view.
 
-[![DataWedge freeform image capture with barcode highlighting via Camera](https://img.youtube.com/vi/BWAvUeLFnQI/0.jpg)](https://www.youtube.com/watch?v=BWAvUeLFnQI)
+[![DataWedge free-form image capture with barcode highlighting via Camera](https://img.youtube.com/vi/hwTDCuvcjYk/0.jpg)](https://www.youtube.com/watch?v=hwTDCuvcjYk)
 
-**The following video shows freeform image capture with barcode highlighting via the Imager:**
+**The following video shows free-form image capture via the Camera:**
 
-This shows a brief scanning session with many barcodes in view.
+The user pans across many barcodes during a long scanning session.
 
-[![DataWedge freeform image capture with barcode highlighting via Camera](https://img.youtube.com/vi/hwTDCuvcjYk/0.jpg)](https://www.youtube.com/watch?v=hwTDCuvcjYk)
+[![DataWedge free-form image capture with barcode highlighting via Camera](https://img.youtube.com/vi/BWAvUeLFnQI/0.jpg)](https://www.youtube.com/watch?v=BWAvUeLFnQI)
 
 
-### Coding and Freeform Image Capture: Receiving Data
+### Coding and Free-Form Image Capture: Receiving Data
 
 The [Workflow programmer's guide](https://techdocs.zebra.com/datawedge/latest/guide/programmers-guides/workflow-input/) gives a lot of detail how to parse workflow return types.  The code applicable to freeform image capture is given below
 
@@ -250,7 +250,7 @@ for (int i = 0; i < dataArray.length(); i++)
     String label = workflowObject.getString("label");
     if (label.equalsIgnoreCase(""))
     {
-      //  Each data decoded barcode is stored in workflowObject.getString("string_data")      
+      //  Each decoded barcode is stored in workflowObject.getString("string_data")      
       //  Symbology returned in workflowObject.getString("barcodetype")
     }
   }
@@ -276,7 +276,7 @@ for (int i = 0; i < dataArray.length(); i++)
 
 ```
 
-### Coding and Freeform Image Capture: Configuring DataWedge
+### Coding and Free-Form Image Capture: Configuring DataWedge
 
 There are two ways to configure freeform image capture in code.  This section is similar to the earlier section talking about configuring DataWedge for barcode highlighting but some of the detail is different.
 
@@ -313,16 +313,16 @@ A new section has been added to the existing SetConfig API for [Workflow Input P
 
 There is a [dedicated SetConfig example](https://techdocs.zebra.com/datawedge/latest/guide/api/setconfig/#setfreeformimagecaptureconfiguration) for freeform image capture.
 
-### Coding and Freeform Image Capture: Registering for change
+### Coding and Free-Form Image Capture: Registering for change
 
 Registering for change in the workflow plugin status was covered earlier in the "Coding and Barcode Highlighting: Registering for change" section.  The code will be identical
 
 
-### Some additional notes for Freeform Image Capture:
+### Some additional notes for Free-Form Image Capture:
 
-- The order the results are given will be the order in which the barcodes were seen by the decoding algorithm, this is will correspond to the order the user passed over them.
+- The order the results are given will be the order in which the barcodes were seen by the decoding algorithm, this will correspond to the order the user passed over them.
 - Captured Barcodes are reported via the Intent plugin as `com.symbol.datawedge.data`
-- If multiple barcodes are captured, the data will be concatenated, i.e. `com.symbol.datawedge.data_string` will return all data without any separators.  It is recommended to use `com.symbol.datawedge.data` instead. 
+- If multiple barcodes are captured, the data returned in `com.symbol.datawedge.data_string` will return all data without any separators.  It is recommended to use `com.symbol.datawedge.data` instead. 
 - As stated in the documentation, the keystroke output will concatenate all the data without any separators.  This means the Intent plugin is really the only viable way to receive data. 
 
 ## Licensing OCR
@@ -374,7 +374,7 @@ To configure OCR, configure your DataWedge profile as follows:
 1. Enable the Workflow input plugin.  If doing this through the DataWedge UI, you will be prompted that you cannot have both the Barcode and Workflow input plugins active.
 2. Scroll down to the OCR type you want and enable it.
 3. Press the  ellipsis to bring up additional parameters
-4. Choose the input source, either camera or imager
+4. Under 'Input Source', only camera is supported at present
 5. Set the session timeout, in ms.  This is the length of time that the scan engine will try to recognize the object in view.  I recommend setting this to about 10 seconds.
 6. Set the Illumination (useful in low light conditions at the trade-off of increased battery use during recognition) and whether each scan will send an image along with the results ('Output Image').
 7. Set the Feedback Parameters, such as haptic feedback, LED notification and decode audio feedback. This is the feedback that will be given when recogition is complete.
@@ -442,7 +442,7 @@ The technical and marketing teams have already gone through the effort of postin
 
 ### Coding and OCR (License Plates, VIN, TIN, Meters): Receiving Data
 
-Parsing OCR results is very similar to how Freeform image capture results are parsed, as explained previously and the [Workflow programmer's guide](https://techdocs.zebra.com/datawedge/latest/guide/programmers-guides/workflow-input/#ocrresultoutput) is the best place to start understanding either.
+Parsing OCR results is very similar to how Free-Form image capture results are parsed, as explained previously and the [Workflow programmer's guide](https://techdocs.zebra.com/datawedge/latest/guide/programmers-guides/workflow-input/#ocrresultoutput) is the best place to start understanding either.
 
 Most importantly for OCR, please refer to the ['OCR Result Output'](https://techdocs.zebra.com/datawedge/latest/guide/programmers-guides/workflow-input/#ocrresultoutput) section of the Workflow programmer's guide as that gives specific information about parsing the received OCR value.
 
@@ -475,7 +475,7 @@ for (int i = 0; i < dataArray.length(); i++)
     }
     else
     {
-      //  Freeform Image capture.  Parse this as shown previously
+      //  Free-Form Image capture.  Parse this as shown previously
     }
   }
   else
